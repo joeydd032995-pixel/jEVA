@@ -201,9 +201,8 @@ python3 eva.py
 
 > demonstration video.
 
-<video controls width="640">
-  <source src="demo_usage.mp4" type="video/mp4">
-</video>
+![Demo Usage](https://raw.githubusercontent.com/ARCANGEL0/EVA/refs/heads/main/demo_usage.mp4)
+
 
 
 ```
