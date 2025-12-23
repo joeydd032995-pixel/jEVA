@@ -200,7 +200,9 @@ python3 eva.py
 ### ㄖ Example of chat session
 
 > demonstration video.
-![EVA DEMO](demo_usage.mp4)
+
+[EVA DEMO](demo_usage.mp4)
+
 
 ```
 USER > I'm on a Windows target at IP 10.10.11.95, what should I enumerate first?
