@@ -25,6 +25,7 @@ init(autoreset=True)
 API_ENDPOINT = "NOT_SET" # <--- change to your desired endpoint if needed
 openai.api_base = "https://g4f.dev/v1"
 openai.api_key = "jl/JIooPPOcQoHgyW65Mhg13TbIB6CgxcRpJdxMfPRPHZD0oYwuFP29tW4PbkSSxr4U0mqe5kGb5RHVVWAVDgEIWhxujkxyDLRnC7j/PdUOY6UXX/WLrjd3RymPB3WQCGSH7G81iAFFXADpK9Arx8tBUPTNSCUBEw+H4/MyHiYAKlR12uEWHUE+6+8Qd6zEUoqa8VyZ0ZfGIS1BJU5MlXQ3C3vs3zTmP480uFMnvUlh/jCUJUuNlcXQu0ghVtgl1nJuFzMbQLqXUbWV8W9Fu13MChcL3udNczGcRzyteSnBiOOtzZuEU7prf/s/RmhAQ3bKMAFR+JMsmmvFMtyJcPqoXGezzr7GugZTtj6mexsmv84sUr4Js7K9UmJdtF9RmVbrY7UC45XwXcIUm0bpm660Nvn/rPASgSBG6LV5YbWKpq4J9djWApUYLNrY3qvUHs9/5bD0riXOpTYQTE2lOAZEraWcAgBgGeeyQwV/+lpwoihKUk8c9/lhwlMHzZ54e+0j7GHl24aLKlovQXHyUCaQNCTuR4yAzYPc5TTR/gROfE0JQpnZZMLqpIy108GDvLQ6iLxkvfA9zyFReKipUtFWAWMPE0fngAh3BvlZrN3f9DE1qIPmLIwAvBRjCVdHUoHfpp8Z8TbSMAov3G0V6hRYtuIVYieRaT3w6vKH0my0="
+G4F_MODEL="gpt-5-1-instant"
 OLLAMA_MODEL = "jimscard/whiterabbit-neo:latest" # recommended ollama model
 CONFIG_DIR = Path.home() / ".config" / "eva" # Path to save EVA files
 SESSIONS_DIR = CONFIG_DIR / "sessions" 
@@ -362,7 +363,7 @@ class LLM:
         elif self.backend == "g4f":
             try:
                 r = openai.ChatCompletion.create(
-                model="gpt-5-1-instant",
+                model=G4F_MODEL,
                 messages=self.history )
                 raw = r.get('choices', [{}])[0].get('message', {}).get('content', "[ <!> No response detected ]")
             except Exception:

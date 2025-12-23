@@ -122,12 +122,17 @@ graph TD
 ### 🍎 Installation
 
 ```bash
-# Ollama for local AI before repo clone.
+# Ollama for local endpoint (optional)
 curl -fsSL https://ollama.ai/install.sh | shr
+
+# EVA installation
 git clone https://github.com/ARCANGEL0/EVA.git
-cd eva
+cd EVA
 chmod +x eva.py
-./eva.py
+./eva.py 
+
+# Adding it to PATH to be acessible anywhere
+sudo mv eva.py /usr/local/bin/eva
 ```
 
 ### ⬢ Configuring EVA.
@@ -159,6 +164,7 @@ When starting EVA, it will automatically handle:
 ```python
 # Key Configuration Options
 API_ENDPOINT = "" # This is the custom API URL.
+G4F_MODEL = "gpt-5-1-instant"
 OLLAMA_MODEL = "jimscard/whiterabbit-neo:latest" # change ollama model as you wish, most recommended one is whiterabbit
 CONFIG_DIR = Path.home() / ".config" / "eva" # config folder for EVA
 SESSIONS_DIR = CONFIG_DIR / "sessions" # where to store EVA sessions
@@ -201,7 +207,7 @@ python3 eva.py
 
 > demonstration video.
 
-![Demo Usage](https://raw.githubusercontent.com/ARCANGEL0/EVA/refs/heads/main/demo_usage.gif)
+![Demo Usage](https://raw.githubusercontent.com/ARCANGEL0/EVA/refs/heads/main/demo.gif)
 
 
 ```
