@@ -46,14 +46,7 @@
 
 ```mermaid
 graph TD
-    INVISIBLE_TOP[ ] --> subgraph "🍎 EVA "
-        AD[⯐ Attack Strategy AI]
-        AE[𝚵 Session Memory]
-        AF[ᐮ Vulnerability Analysis]
-        AG[CVE DATABASE SEARCH - IN DEVELOPMENT]
-        AH[𐰬 Output Processing]
-    end
-    
+ 
     A[🜂 EVA Launch] --> B{🢧 Session Selection}
     B -->|Existing Session| C[🢧 Load Session Data]
     B -->|New Session| D[߭ Initialize Session]
@@ -63,7 +56,7 @@ graph TD
     E --> F[🦙 Ollama Local]
     E --> G[⬡ OpenAI GPT]
     E --> H[⟅ Custom API]
-    E --> I[ᛃ G4F.dev Provider]
+    E --> I[🜅 G4F.dev Provider]
     
     F --> J[Pentest Shell]
     G --> J
@@ -83,7 +76,8 @@ graph TD
     R --> L
     
     Q --> S[⚡ Exploitation Phase]
-    Q --> T[Export graphs and mapped networks - IN DEVELOPMENT]
+    Q --> T[Export graphs and mapped networks
+     - IN DEVELOPMENT -]
     
     S --> U[➤_ Execute Exploit]
     U --> V{🞜 Access Gained?}
@@ -95,24 +89,29 @@ graph TD
     W --> Y[𐦝 Post-Exploitation]
     Y --> Z{🞜 Objectives Met?}
     
-    Z -->|Generate Report| AA[📋 Generate Report - STILL IN DEVELOPMENT]
+    Z -->|Generate Report| AA[📋 Generate Report 
+     - IN DEVELOPMENT -]
     Z -->|Exit and Save| AB[💾 Save & Exit]
     Z -->|No| AC[🔍 Continue Pentest]
     AC --> L
     
     AA --> AB
     
-    %% Connections to subgraph
+    subgraph "🍎 EVA "
+        AD[⯐ Attack Strategy AI]
+        AE[𝚵 Session Memory]
+        AF[ᐮ Vulnerability Analysis]
+        AG[CVE DATABASE SEARCH  
+ - IN DEVELOPMENT -]
+        AH[𐰬 Output Processing]
+    end
+    
     L --> AD
     AD --> AE
     O --> AF
     AF --> AG
     AG --> AH
     AH --> L
-     
-
-    classDef subgraphTitle font-size:20px;
-    class subgraph subgraphTitle;   
 ```
 
 ---
