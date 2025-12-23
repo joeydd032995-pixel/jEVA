@@ -84,7 +84,7 @@ graph TD
     U --> W[𐦝 Post-Exploitation]
     W --> X{🞜 Objectives Met?}
     
-    X -->|Yes| Y[📋 Generate Report (STILL IN DEVELOPMENT)]
+    X -->|Yes| Y[📋 Generate Report -STILL IN DEVELOPMENT-]
     X -->|No| Z[🔍 Continue Pentest]
     Z --> L
     
