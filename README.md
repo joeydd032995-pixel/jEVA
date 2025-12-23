@@ -44,7 +44,6 @@
 
 ## ⵢ EVA Logic & Pentest Process Flow
 
-
 ```mermaid
 graph TD
     A[🜂 EVA Launch] --> B{🢧 Session Selection}
@@ -84,14 +83,14 @@ graph TD
     U --> W[𐦝 Post-Exploitation]
     W --> X{🞜 Objectives Met?}
     
-    X -->|Yes| Y[📋 Generate Report -STILL IN DEVELOPMENT-]
+    X -->|Yes| Y[📋 Generate Report]
     X -->|No| Z[🔍 Continue Pentest]
     Z --> L
     
     Y --> AA[💾 Save & Exit]
     
-    subgraph "\n\n🍎 EVA "
-        AA[⯐ Attack Strategy AI]
+    subgraph "🍎 EVA "
+        BB[⯐ Attack Strategy AI]
         CC[𝚵 Session Memory]
         DD[ᐮ Vulnerability Analysis]
         EE[𐰬 Output Processing]
