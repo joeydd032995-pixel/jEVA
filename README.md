@@ -84,14 +84,14 @@ graph TD
     U --> W[𐦝 Post-Exploitation]
     W --> X{🞜 Objectives Met?}
     
-    X -->|Yes| Y[📋 Generate Report]
+    X -->|Yes| Y[📋 Generate Report (STILL IN DEVELOPMENT)]
     X -->|No| Z[🔍 Continue Pentest]
     Z --> L
     
     Y --> AA[💾 Save & Exit]
     
-    subgraph "🍎 EVA "
-        BB[⯐ Attack Strategy AI]
+    subgraph "\n\n🍎 EVA "
+        AA[⯐ Attack Strategy AI]
         CC[𝚵 Session Memory]
         DD[ᐮ Vulnerability Analysis]
         EE[𐰬 Output Processing]
@@ -103,15 +103,6 @@ graph TD
     DD --> EE
     EE --> L
     
-    style A fill:#ff6b6b
-    style I fill:#4ecdc4
-    style K fill:#45b7d1
-    style L fill:#96ceb4
-    style P fill:#ff4757
-    style U fill:#ffa502
-    style Y fill:#2ed573
-    style AA fill:#feca57
-    style BB fill:#ff9ff3
 ```
 
 ---
