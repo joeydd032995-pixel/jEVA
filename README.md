@@ -201,8 +201,7 @@ python3 eva.py
 
 > demonstration video.
 
-![Demo Usage](https://raw.githubusercontent.com/ARCANGEL0/EVA/refs/heads/main/demo_usage.mp4)
-
+![Demo Usage](https://raw.githubusercontent.com/ARCANGEL0/EVA/refs/heads/main/demo_usage.gif)
 
 
 ```
