@@ -140,6 +140,8 @@ When starting EVA, it will automatically handle:
 
 <strong> If you wish to modify endpoints, ollama models or other: you can find these options in the config section at `eva.py` </strong>
 
+> Also, YES. I am aware it is a one-file only script and it ain't good coding practices, I've heard complaints about why not splitting into modules. i PURPOSELY made as one file only to be run as a single run easier on path, if you want to split, just fork it and copy paste to different .py files and set EVA as modular rather than one-file.
+
 ### 📁 Directory Structure of EVA (currently single-file and not modular)
 
 ```
