@@ -46,6 +46,14 @@
 
 ```mermaid
 graph TD
+    INVISIBLE_TOP[ ] --> subgraph "🍎 EVA "
+        AD[⯐ Attack Strategy AI]
+        AE[𝚵 Session Memory]
+        AF[ᐮ Vulnerability Analysis]
+        AG[CVE DATABASE SEARCH - IN DEVELOPMENT]
+        AH[𐰬 Output Processing]
+    end
+    
     A[🜂 EVA Launch] --> B{🢧 Session Selection}
     B -->|Existing Session| C[🢧 Load Session Data]
     B -->|New Session| D[߭ Initialize Session]
@@ -55,53 +63,56 @@ graph TD
     E --> F[🦙 Ollama Local]
     E --> G[⬡ OpenAI GPT]
     E --> H[⟅ Custom API]
+    E --> I[ᛃ G4F.dev Provider]
     
-    F --> I[Pentest Shell]
-    G --> I
-    H --> I
+    F --> J[Pentest Shell]
+    G --> J
+    H --> J
+    I --> J
     
-    I --> J[⌖ Target Definition]
-    J --> K[🧠 AI Pentest Strategy]
+    J --> K[⌖ Target Definition]
+    K --> L[🧠 AI Pentest Strategy]
     
-    K --> L[🝯 Reconnaissance Phase]
-    L --> M[➤_ Execute Commands]
-    M --> N[ꎐ Analyze Results]
-    N --> O{ᐈ Vulnerabilities Found?}
+    L --> M[🝯 Reconnaissance Phase]
+    M --> N[➤_ Execute Commands]
+    N --> O[ꎐ Analyze Results]
+    O --> P{ᐈ Vulnerabilities Found?}
     
-    O -->|Yes| P[🖧 Exploitation Planning]
-    O -->|No| Q[⭯ More Enumeration]
-    Q --> L
+    P -->|Yes| Q[🖧 Exploitation Planning]
+    P -->|No| R[⭯ More Enumeration]
+    R --> L
     
-    P --> R[⚡ Exploitation Phase]
-    R --> S[➤_ Execute Exploit]
-    S --> T{🞜 Access Gained?}
+    Q --> S[⚡ Exploitation Phase]
+    Q --> T[Export graphs and mapped networks - IN DEVELOPMENT]
     
-    T -->|Yes| U[𐱃 Privilege Escalation]
-    T -->|Failed| V[⭯ Alternative Methods]
-    V --> P
+    S --> U[➤_ Execute Exploit]
+    U --> V{🞜 Access Gained?}
     
-    U --> W[𐦝 Post-Exploitation]
-    W --> X{🞜 Objectives Met?}
+    V -->|Yes| W[𐱃 Privilege Escalation]
+    V -->|Failed| X[⭯ Alternative Methods]
+    X --> Q
     
-    X -->|Yes| Y[📋 Generate Report]
-    X -->|No| Z[🔍 Continue Pentest]
-    Z --> L
+    W --> Y[𐦝 Post-Exploitation]
+    Y --> Z{🞜 Objectives Met?}
     
-    Y --> AA[💾 Save & Exit]
+    Z -->|Generate Report| AA[📋 Generate Report - STILL IN DEVELOPMENT]
+    Z -->|Exit and Save| AB[💾 Save & Exit]
+    Z -->|No| AC[🔍 Continue Pentest]
+    AC --> L
     
-    subgraph "🍎 EVA "
-        BB[⯐ Attack Strategy AI]
-        CC[𝚵 Session Memory]
-        DD[ᐮ Vulnerability Analysis]
-        EE[𐰬 Output Processing]
-    end
+    AA --> AB
     
-    K --> BB
-    BB --> CC
-    N --> DD
-    DD --> EE
-    EE --> L
-    
+    %% Connections to subgraph
+    L --> AD
+    AD --> AE
+    O --> AF
+    AF --> AG
+    AG --> AH
+    AH --> L
+     
+
+    classDef subgraphTitle font-size:20px;
+    class subgraph subgraphTitle;   
 ```
 
 ---
