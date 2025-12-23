@@ -201,7 +201,9 @@ python3 eva.py
 
 > demonstration video.
 
-[EVA DEMO](demo_usage.mp4)
+<video controls width="640">
+  <source src="demo_usage.mp4" type="video/mp4">
+</video>
 
 
 ```
