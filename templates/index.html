@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVA - Exploit Vector Agent</title>
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a25;
+            --text-primary: #00ff88;
+            --text-secondary: #00cc6a;
+            --text-muted: #666;
+            --accent-cyan: #00ffff;
+            --accent-magenta: #ff00ff;
+            --accent-red: #ff4444;
+            --accent-yellow: #ffff00;
+            --border-color: #00ff8855;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 2px solid var(--border-color);
+            padding: 15px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            color: var(--accent-cyan);
+            text-shadow: 0 0 10px var(--accent-cyan);
+        }
+
+        .header .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 2px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-section h3 {
+            color: var(--accent-cyan);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 8px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .nav-tab:hover, .nav-tab.active {
+            background: var(--text-primary);
+            color: var(--bg-primary);
+        }
+
+        .session-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .session-item {
+            padding: 10px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .session-item:hover {
+            border-color: var(--accent-cyan);
+        }
+
+        .session-item.active {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        .session-item .name {
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .session-item .meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background: var(--text-primary);
+            color: var(--bg-primary);
+        }
+
+        .btn-danger {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .btn-danger:hover {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 3px solid;
+        }
+
+        .message.user {
+            background: rgba(0, 255, 136, 0.1);
+            border-color: var(--text-primary);
+        }
+
+        .message.analysis {
+            background: rgba(255, 0, 255, 0.1);
+            border-color: var(--accent-magenta);
+        }
+
+        .message.command {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: var(--accent-cyan);
+        }
+
+        .message.error {
+            background: rgba(255, 68, 68, 0.1);
+            border-color: var(--accent-red);
+        }
+
+        .message-header {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .message-content {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+
+        .command-box {
+            background: var(--bg-primary);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid var(--border-color);
+            font-family: monospace;
+        }
+
+        .command-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .command-actions button {
+            padding: 8px 15px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .command-actions button:hover {
+            background: var(--text-primary);
+            color: var(--bg-primary);
+        }
+
+        .command-actions button.run {
+            border-color: var(--text-primary);
+        }
+
+        .command-actions button.skip {
+            border-color: var(--accent-yellow);
+            color: var(--accent-yellow);
+        }
+
+        .input-area {
+            padding: 15px;
+            background: var(--bg-secondary);
+            border-top: 2px solid var(--border-color);
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-wrapper input {
+            flex: 1;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+        }
+
+        .input-wrapper button {
+            padding: 12px 25px;
+            background: var(--text-primary);
+            border: none;
+            color: var(--bg-primary);
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .input-wrapper button:hover {
+            background: var(--accent-cyan);
+        }
+
+        .input-wrapper button:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            padding: 25px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            color: var(--accent-cyan);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+        }
+
+        .form-group .help-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .backend-option {
+            padding: 10px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .backend-option:hover {
+            border-color: var(--accent-cyan);
+        }
+
+        .backend-option.selected {
+            border-color: var(--text-primary);
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        .backend-option.unavailable {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .backend-option .name {
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .backend-option .desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            border-radius: 3px;
+            margin-left: 10px;
+        }
+
+        .status-badge.available {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--text-primary);
+        }
+
+        .status-badge.unavailable {
+            background: rgba(255, 68, 68, 0.2);
+            color: var(--accent-red);
+        }
+
+        /* Upload section */
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            padding: 30px;
+            text-align: center;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .upload-area:hover {
+            border-color: var(--accent-cyan);
+        }
+
+        .upload-area input {
+            display: none;
+        }
+
+        .upload-result {
+            margin-top: 15px;
+            padding: 10px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            word-break: break-all;
+        }
+
+        /* Welcome screen */
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .welcome-screen .logo {
+            font-size: 3rem;
+            color: var(--accent-cyan);
+            text-shadow: 0 0 20px var(--accent-cyan);
+            margin-bottom: 20px;
+        }
+
+        .welcome-screen h2 {
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .welcome-screen p {
+            color: var(--text-muted);
+            max-width: 500px;
+            line-height: 1.6;
+        }
+
+        .welcome-screen .warning {
+            margin-top: 30px;
+            padding: 15px;
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+            max-width: 500px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--text-muted);
+            border-top-color: var(--text-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⫻ E.V.A</h1>
+        <div class="subtitle">Exploit Vector Agent - AI-Powered Penetration Testing Assistant</div>
+    </div>
+
+    <div class="main-container">
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <div class="nav-tabs">
+                    <button class="nav-tab active" onclick="showTab('sessions')">Sessions</button>
+                    <button class="nav-tab" onclick="showTab('tools')">Tools</button>
+                </div>
+            </div>
+
+            <div id="sessions-tab" class="sidebar-section">
+                <h3>📁 Sessions</h3>
+                <div id="session-list" class="session-list">
+                    <!-- Sessions will be loaded here -->
+                </div>
+                <button class="btn" onclick="showNewSessionModal()">+ New Session</button>
+            </div>
+
+            <div id="tools-tab" class="sidebar-section" style="display: none;">
+                <h3>🔧 Tools</h3>
+                <button class="btn" onclick="showUploadModal()">📤 File Upload</button>
+                <button class="btn" onclick="showApiKeyModal()">🔑 Set OpenAI Key</button>
+                <button class="btn" onclick="refreshBackends()">🔄 Refresh Backends</button>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>ℹ️ Current Session</h3>
+                <div id="current-session-info">
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">No session loaded</p>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>📖 Quick Help</h3>
+                <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.6;">
+                    <p><strong>Input Examples:</strong></p>
+                    <p>• "Scan target 10.10.10.1"</p>
+                    <p>• "Enumerate SMB shares"</p>
+                    <p>• "Check for web vulnerabilities"</p>
+                    <p>• "Suggest privilege escalation"</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div id="chat-container" class="chat-container">
+                <div class="welcome-screen">
+                    <div class="logo">⫻ EVA</div>
+                    <h2>Welcome to EVA</h2>
+                    <p>EVA is an AI-powered penetration testing assistant that helps guide you through security assessments. Create or load a session to begin.</p>
+                    <div class="warning">
+                        <strong>⚠️ LEGAL NOTICE</strong><br>
+                        This tool is for authorized use only: CTFs, labs, and systems you own or have explicit permission to test. Unauthorized use is illegal.
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <input type="text" id="user-input" placeholder="Enter your query (e.g., 'Scan target 192.168.1.1 for open ports')" disabled>
+                    <button id="send-btn" onclick="sendMessage()" disabled>SEND</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Session Modal -->
+    <div id="new-session-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Create New Session</div>
+            <div class="form-group">
+                <label>Session Name</label>
+                <input type="text" id="session-name" placeholder="e.g., htb-machine-1">
+                <div class="help-text">Alphanumeric characters and hyphens only</div>
+            </div>
+            <div class="form-group">
+                <label>Select AI Backend</label>
+                <div id="backend-list">
+                    <!-- Backends will be loaded here -->
+                </div>
+            </div>
+            <button class="btn" onclick="createSession()">Create Session</button>
+            <button class="btn btn-danger" onclick="closeModal('new-session-modal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">📤 File Upload</div>
+            <p style="color: var(--text-muted); margin-bottom: 15px;">Upload images or files to hosting services (imgbb, telegra.ph, catbox.moe)</p>
+            <div class="upload-area" onclick="document.getElementById('file-input').click()">
+                <input type="file" id="file-input" onchange="uploadFile()">
+                <p>Click to select a file or drag and drop</p>
+            </div>
+            <div id="upload-result" class="upload-result" style="display: none;"></div>
+            <button class="btn btn-danger" onclick="closeModal('upload-modal')">Close</button>
+        </div>
+    </div>
+
+    <!-- API Key Modal -->
+    <div id="api-key-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">🔑 Set OpenAI API Key</div>
+            <div class="form-group">
+                <label>OpenAI API Key</label>
+                <input type="password" id="openai-key" placeholder="sk-...">
+                <div class="help-text">Your API key will be stored locally in .env file</div>
+            </div>
+            <button class="btn" onclick="saveApiKey()">Save Key</button>
+            <button class="btn btn-danger" onclick="closeModal('api-key-modal')">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSession = null;
+        let selectedBackend = 'demo';
+        let pendingCommands = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSessions();
+            loadBackends();
+            
+            document.getElementById('user-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        });
+
+        function showTab(tab) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.nav-tab[onclick="showTab('${tab}')"]`).classList.add('active');
+            
+            document.getElementById('sessions-tab').style.display = tab === 'sessions' ? 'block' : 'none';
+            document.getElementById('tools-tab').style.display = tab === 'tools' ? 'block' : 'none';
+        }
+
+        async function loadSessions() {
+            try {
+                const response = await fetch('/api/sessions');
+                const data = await response.json();
+                
+                const list = document.getElementById('session-list');
+                if (data.sessions.length === 0) {
+                    list.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem;">No sessions yet</p>';
+                } else {
+                    list.innerHTML = data.sessions.map(s => `
+                        <div class="session-item ${currentSession === s.name ? 'active' : ''}" onclick="loadSession('${s.name}')">
+                            <div class="name">${s.name}</div>
+                            <div class="meta">Backend: ${s.backend} | Messages: ${s.messages}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading sessions:', error);
+            }
+        }
+
+        async function loadBackends() {
+            try {
+                const response = await fetch('/api/backends');
+                const data = await response.json();
+                
+                const list = document.getElementById('backend-list');
+                list.innerHTML = data.backends.map(b => `
+                    <div class="backend-option ${b.id === selectedBackend ? 'selected' : ''} ${!b.available ? 'unavailable' : ''}" 
+                         onclick="${b.available ? `selectBackend('${b.id}')` : ''}">
+                        <div class="name">${b.name}
+                            <span class="status-badge ${b.available ? 'available' : 'unavailable'}">
+                                ${b.available ? 'Available' : 'Unavailable'}
+                            </span>
+                        </div>
+                        <div class="desc">${b.description}</div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading backends:', error);
+            }
+        }
+
+        function selectBackend(id) {
+            selectedBackend = id;
+            document.querySelectorAll('.backend-option').forEach(el => {
+                el.classList.remove('selected');
+                if (el.querySelector('.name').textContent.toLowerCase().includes(id)) {
+                    el.classList.add('selected');
+                }
+            });
+            loadBackends();
+        }
+
+        function showNewSessionModal() {
+            loadBackends();
+            document.getElementById('new-session-modal').classList.add('active');
+        }
+
+        function showUploadModal() {
+            document.getElementById('upload-result').style.display = 'none';
+            document.getElementById('upload-modal').classList.add('active');
+        }
+
+        function showApiKeyModal() {
+            document.getElementById('api-key-modal').classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        async function createSession() {
+            const name = document.getElementById('session-name').value.trim() || `session-${Date.now()}`;
+            
+            try {
+                const response = await fetch('/api/sessions/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, backend: selectedBackend })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    closeModal('new-session-modal');
+                    currentSession = name;
+                    loadSessions();
+                    loadSession(name);
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error creating session: ' + error);
+            }
+        }
+
+        async function loadSession(name) {
+            try {
+                const response = await fetch(`/api/sessions/${name}/load`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentSession = name;
+                    document.getElementById('user-input').disabled = false;
+                    document.getElementById('send-btn').disabled = false;
+                    
+                    document.getElementById('current-session-info').innerHTML = `
+                        <p style="color: var(--text-primary);"><strong>${name}</strong></p>
+                        <p style="color: var(--text-muted); font-size: 0.8rem;">Backend: ${data.backend}</p>
+                        <button class="btn btn-danger" style="margin-top: 10px;" onclick="deleteSession('${name}')">Delete Session</button>
+                    `;
+                    
+                    renderTimeline(data.timeline);
+                    loadSessions();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error loading session: ' + error);
+            }
+        }
+
+        async function deleteSession(name) {
+            if (!confirm(`Delete session "${name}"?`)) return;
+            
+            try {
+                await fetch(`/api/sessions/${name}/delete`, { method: 'DELETE' });
+                if (currentSession === name) {
+                    currentSession = null;
+                    document.getElementById('user-input').disabled = true;
+                    document.getElementById('send-btn').disabled = true;
+                    document.getElementById('chat-container').innerHTML = `
+                        <div class="welcome-screen">
+                            <div class="logo">⫻ EVA</div>
+                            <h2>Welcome to EVA</h2>
+                            <p>Create or load a session to begin.</p>
+                        </div>
+                    `;
+                    document.getElementById('current-session-info').innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem;">No session loaded</p>';
+                }
+                loadSessions();
+            } catch (error) {
+                alert('Error deleting session: ' + error);
+            }
+        }
+
+        function renderTimeline(timeline) {
+            const container = document.getElementById('chat-container');
+            
+            if (!timeline || timeline.length === 0) {
+                container.innerHTML = `
+                    <div class="message" style="border-color: var(--accent-cyan);">
+                        <div class="message-header">EVA Ready</div>
+                        <div class="message-content">Session loaded. Enter your query below to begin.
+
+<strong>Example inputs:</strong>
+• "I need help with a CTF machine, IP is 10.10.16.81"
+• "Scan target 192.168.1.100 for vulnerabilities"
+• "Enumerate web services on port 80"
+• "Check for privilege escalation vectors"
+
+<strong>Note:</strong> EVA will analyze your request and suggest shell commands.
+You can then choose to [Run], [Skip], or [Ask] for more details.</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = timeline.map(item => {
+                if (item.type === 'user') {
+                    return `
+                        <div class="message user">
+                            <div class="message-header">👤 User</div>
+                            <div class="message-content">${escapeHtml(item.content)}</div>
+                        </div>
+                    `;
+                } else if (item.type === 'analysis') {
+                    return `
+                        <div class="message analysis">
+                            <div class="message-header">🧠 EVA Analysis</div>
+                            <div class="message-content">${escapeHtml(item.content)}</div>
+                        </div>
+                    `;
+                } else if (item.type === 'command') {
+                    return `
+                        <div class="message command">
+                            <div class="message-header">⚡ Command Executed</div>
+                            <div class="command-box">${escapeHtml(item.cmd)}</div>
+                            <div class="message-content">${escapeHtml(item.output || 'No output')}</div>
+                        </div>
+                    `;
+                }
+                return '';
+            }).join('');
+            
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const message = input.value.trim();
+            
+            if (!message || !currentSession) return;
+            
+            input.value = '';
+            input.disabled = true;
+            document.getElementById('send-btn').disabled = true;
+            
+            // Add user message to chat
+            addMessage('user', message);
+            addMessage('loading', 'EVA is thinking...');
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session: currentSession, message })
+                });
+                
+                const data = await response.json();
+                
+                // Remove loading message
+                removeLoadingMessage();
+                
+                if (data.success) {
+                    addMessage('analysis', data.analysis);
+                    
+                    if (data.commands && data.commands.length > 0) {
+                        pendingCommands = data.commands;
+                        showCommandPrompt(data.commands[0], 0);
+                    }
+                } else {
+                    addMessage('error', 'Error: ' + data.error);
+                }
+            } catch (error) {
+                removeLoadingMessage();
+                addMessage('error', 'Error: ' + error);
+            }
+            
+            input.disabled = false;
+            document.getElementById('send-btn').disabled = false;
+            input.focus();
+        }
+
+        function addMessage(type, content) {
+            const container = document.getElementById('chat-container');
+            
+            // Remove welcome screen if present
+            const welcome = container.querySelector('.welcome-screen');
+            if (welcome) welcome.remove();
+            
+            const headers = {
+                'user': '👤 User',
+                'analysis': '🧠 EVA Analysis',
+                'command': '⚡ Command',
+                'error': '❌ Error',
+                'loading': '⏳ Processing'
+            };
+            
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            div.innerHTML = `
+                <div class="message-header">${headers[type] || type}</div>
+                <div class="message-content">${type === 'loading' ? '<span class="loading"></span> ' + content : escapeHtml(content)}</div>
+            `;
+            
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function removeLoadingMessage() {
+            const loading = document.querySelector('.message.loading');
+            if (loading) loading.remove();
+        }
+
+        function showCommandPrompt(command, index) {
+            const container = document.getElementById('chat-container');
+            
+            const div = document.createElement('div');
+            div.className = 'message command';
+            div.id = `command-prompt-${index}`;
+            div.innerHTML = `
+                <div class="message-header">📋 Suggested Command (${index + 1}/${pendingCommands.length})</div>
+                <div class="command-box">${escapeHtml(command)}</div>
+                <div class="command-actions">
+                    <button class="run" onclick="runCommand('${escapeHtml(command).replace(/'/g, "\\'")}', ${index})">[R]un</button>
+                    <button class="skip" onclick="skipCommand(${index})">[S]kip</button>
+                    <button onclick="askMore()">[A]sk More</button>
+                </div>
+            `;
+            
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function runCommand(command, index) {
+            const promptDiv = document.getElementById(`command-prompt-${index}`);
+            if (promptDiv) {
+                promptDiv.querySelector('.command-actions').innerHTML = '<span class="loading"></span> Executing...';
+            }
+            
+            try {
+                const response = await fetch('/api/execute', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session: currentSession, command })
+                });
+                
+                const data = await response.json();
+                
+                if (promptDiv) {
+                    promptDiv.innerHTML = `
+                        <div class="message-header">⚡ Command Executed</div>
+                        <div class="command-box">${escapeHtml(command)}</div>
+                        <div class="message-content">${escapeHtml(data.output || 'No output')}</div>
+                    `;
+                }
+                
+                // Analyze output
+                addMessage('loading', 'EVA is analyzing the output...');
+                
+                const analyzeResponse = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session: currentSession })
+                });
+                
+                const analyzeData = await analyzeResponse.json();
+                removeLoadingMessage();
+                
+                if (analyzeData.success) {
+                    addMessage('analysis', analyzeData.analysis);
+                    
+                    if (analyzeData.commands && analyzeData.commands.length > 0) {
+                        pendingCommands = analyzeData.commands;
+                        showCommandPrompt(analyzeData.commands[0], 0);
+                    }
+                }
+            } catch (error) {
+                if (promptDiv) {
+                    promptDiv.querySelector('.command-actions').innerHTML = `<span style="color: var(--accent-red);">Error: ${error}</span>`;
+                }
+            }
+        }
+
+        function skipCommand(index) {
+            const promptDiv = document.getElementById(`command-prompt-${index}`);
+            if (promptDiv) {
+                promptDiv.innerHTML = `
+                    <div class="message-header">⏭️ Command Skipped</div>
+                    <div class="command-box" style="opacity: 0.5;">${escapeHtml(pendingCommands[index])}</div>
+                `;
+            }
+            
+            // Show next command if available
+            if (index + 1 < pendingCommands.length) {
+                showCommandPrompt(pendingCommands[index + 1], index + 1);
+            }
+        }
+
+        function askMore() {
+            document.getElementById('user-input').focus();
+        }
+
+        async function uploadFile() {
+            const fileInput = document.getElementById('file-input');
+            const resultDiv = document.getElementById('upload-result');
+            
+            if (!fileInput.files.length) return;
+            
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<span class="loading"></span> Uploading...';
+            
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <strong>✅ Upload successful!</strong><br>
+                        Provider: ${data.provider}<br>
+                        URL: <a href="${data.url}" target="_blank" style="color: var(--accent-cyan);">${data.url}</a>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<span style="color: var(--accent-red);">❌ Error: ${data.error}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span style="color: var(--accent-red);">❌ Error: ${error}</span>`;
+            }
+            
+            fileInput.value = '';
+        }
+
+        async function saveApiKey() {
+            const key = document.getElementById('openai-key').value.trim();
+            
+            if (!key) {
+                alert('Please enter an API key');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/config/openai-key', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('API key saved successfully!');
+                    closeModal('api-key-modal');
+                    loadBackends();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error saving API key: ' + error);
+            }
+        }
+
+        function refreshBackends() {
+            loadBackends();
+            alert('Backends refreshed!');
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
