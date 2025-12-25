@@ -299,9 +299,9 @@ class LLM:
         elif self.backend == "g4f":
             ###### G4F has rate limits within a timeframe, this logic checks for rate limit errors and resends a 
             ###### request until a valid response is obtained, fallback to a error message if none of it works
-            max_retries = 10  # Retry up to 10 times (adjust as needed; set higher for "until I get a result ts")
+            max_retries = 10  # Retry up to 10 times (adjust as needed; set higher for "until I get a result typesh")
             retry_delay = 10  # Wait 10 seconds between retries
-            raw = ""  # Default to empty if all retries fail
+            raw = ""  
             
             for attempt in range(max_retries):
                 try:
@@ -312,28 +312,23 @@ class LLM:
                     if isinstance(r, dict) and 'error' in r:
                         error_message = r['error'].get('message', '')
                         if "You are most wanted! Please wait before making another request." in error_message or "Rate limit" in error_message:
-                            # Blocked/Error with backend
                             time.sleep(retry_delay)
                             continue  # Retry
                         else:
-                           # Other error with backend
-                            break
+                            continue
                     
-                    # If we get here, it's a successful response
                     raw = r.get('choices', [{}])[0].get('message', {}).get('content', "[ <!> No response detected ]")
-                    break  # Success, exit loop
+                    break  
                 
                 except openai.error.RateLimitError as e:
                     # Rate limit error with backend 
                     time.sleep(retry_delay)
                     continue
                 except Exception as e:
-                    print(Fore.YELLOW + f"⚠️ Unexpected error with backend [G4F]:\n{Fore.RED}{e}")
-                    break  # Don't retry for unexpected errors
-            
+                    continue
             if attempt == max_retries - 1 and not raw:
                 print(Fore.YELLOW + "⚠️ Max retries reached with backend [G4F]. No result obtained.")
-                raw = "[ <!> No response detected ]"  # Ensure raw is empty on failure
+                raw = "[ <!> No response detected ]"  
                 
                 
         # ================= CUSTOM API =================
