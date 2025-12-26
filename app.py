@@ -166,9 +166,9 @@ class LLM:
                 raw = f'{{"analysis": "Error running Ollama: {str(e)}", "commands": []}}'
 
         elif self.backend == "g4f":
-            # G4F has rate limits - implement retry logic
-            max_retries = 10
-            retry_delay = 10
+            # G4F has rate limits - implement retry logic (1 request per 10 seconds)
+            max_retries = 5
+            retry_delay = 12  # Wait 12 seconds between retries to respect rate limit
             
             for attempt in range(max_retries):
                 try:
@@ -176,17 +176,25 @@ class LLM:
                         model=G4F_MODEL,
                         messages=self.history
                     )
-                    if isinstance(r, dict) and 'error' in r:
-                        error_message = r['error'].get('message', '')
-                        if "You are most wanted! Please wait" in error_message or "Rate limit" in error_message:
+                    # Handle string response (error codes like "error code: 1033")
+                    if isinstance(r, str):
+                        if "error code" in r.lower() or "rate limit" in r.lower():
                             time.sleep(retry_delay)
                             continue
-                        else:
-                            continue
-                    
-                    raw = r.get('choices', [{}])[0].get('message', {}).get('content', "")
-                    if raw:
+                        raw = r
                         break
+                    # Handle dict response
+                    if isinstance(r, dict):
+                        if 'error' in r:
+                            error_message = r['error'].get('message', '')
+                            if "You are most wanted! Please wait" in error_message or "Rate limit" in error_message:
+                                time.sleep(retry_delay)
+                                continue
+                            else:
+                                continue
+                        raw = r.get('choices', [{}])[0].get('message', {}).get('content', "")
+                        if raw:
+                            break
                 except Exception as e:
                     if attempt < max_retries - 1:
                         time.sleep(retry_delay)
@@ -194,7 +202,7 @@ class LLM:
                     raw = f'{{"analysis": "Error with G4F backend after {max_retries} retries: {str(e)}", "commands": []}}'
             
             if not raw:
-                raw = f'{{"analysis": "⚠️ Max retries reached with G4F backend. Please try again later.", "commands": []}}'
+                raw = f'{{"analysis": "⚠️ G4F.dev service is currently unavailable (error code 1033). This is a temporary service issue. Please try again later or use Demo Mode to test the interface.", "commands": []}}'
 
         elif self.backend == "api":
             try:
@@ -209,12 +217,21 @@ class LLM:
 
         elif self.backend == "gpt":
             try:
-                client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY", ""))
-                completion = client.chat.completions.create(
+                # Save and restore G4F settings
+                old_base = openai.api_base
+                old_key = openai.api_key
+                openai.api_base = "https://api.openai.com/v1"
+                openai.api_key = os.environ.get("OPENAI_API_KEY", "")
+                
+                r = openai.ChatCompletion.create(
                     model="gpt-4",
                     messages=self.history
                 )
-                raw = completion.choices[0].message.content
+                raw = r.get('choices', [{}])[0].get('message', {}).get('content', "")
+                
+                # Restore G4F settings
+                openai.api_base = old_base
+                openai.api_key = old_key
             except Exception as e:
                 raw = f'{{"analysis": "Error with OpenAI GPT: {str(e)}", "commands": []}}'
 
